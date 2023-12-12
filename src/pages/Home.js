@@ -9,8 +9,9 @@
   =========================================================
   * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
-import { useState } from "react";
-
+import React, { useEffect, useState, useContext } from "react";
+import { db } from "../service/firebase/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import {
   Card,
   Col,
@@ -45,12 +46,11 @@ import team2 from "../assets/images/team-2.jpg";
 import team3 from "../assets/images/team-3.jpg";
 import team4 from "../assets/images/team-4.jpg";
 import card from "../assets/images/info-card-1.jpg";
+import { ProductContext } from "../store/product-context";
 
 function Home() {
   const { Title, Text } = Typography;
-
   const onChange = (e) => console.log(`radio checked:${e.target.value}`);
-
   const [reverse, setReverse] = useState(false);
 
   const dollor = [

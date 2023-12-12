@@ -13,6 +13,7 @@
 import ReactApexChart from "react-apexcharts";
 import { Row, Col, Typography } from "antd";
 import eChart from "./configs/eChart";
+import React from "react";
 
 function EChart() {
   const { Title, Paragraph } = Typography;

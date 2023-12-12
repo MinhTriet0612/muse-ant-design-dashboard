@@ -173,7 +173,7 @@ const FormDisabledDemo = () => {
           products.thumbnail === imgUrl.img
       )
     ) {
-      openNotification("Thêm sản phẩm thành công", "Thêm sản phẩm thành công");
+      openNotification("Sucess", "Chỉnh sửa sản phẩm thành công ");
       addProduct({
         id: uuidv4(),
         key: typeProductRef.current,
@@ -195,10 +195,7 @@ const FormDisabledDemo = () => {
         thumbnail: imgUrl.img,
       });
     } else {
-      openNotification(
-        "Thêm sản phẩm thất bại",
-        "Vui lòng nhập đầy đủ thông tin sản phẩm"
-      );
+      openNotification("Failure", "Xin nhập lại thông tin");
       console.log(products);
     }
   };
@@ -363,7 +360,10 @@ const FormDisabledDemo = () => {
           htmlType="submit"
           onClick={handleOnClickForAddProduct}
         >
-          Thêm Sản Phẩm
+          Chỉnh Sửa
+        </Button>
+        <Button type="" htmlType="submit">
+          Hủy
         </Button>
       </Form>
     </>

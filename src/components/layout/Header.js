@@ -10,7 +10,7 @@
   * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Row,
@@ -27,16 +27,21 @@ import {
   Switch,
 } from "antd";
 
+import { auth } from "../../service/firebase/firebase";
+import { signOut } from "firebase/auth";
+
 import {
   SearchOutlined,
   StarOutlined,
   TwitterOutlined,
   FacebookFilled,
+  LogoutOutlined,
 } from "@ant-design/icons";
 
 import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
 import avtar from "../../assets/images/team-2.jpg";
+import { AuthContext } from "../../store/AuthProvider";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -249,7 +254,7 @@ const setting = [
   </svg>,
 ];
 
-function Header({
+const Header = ({
   placement,
   name,
   subName,
@@ -257,7 +262,7 @@ function Header({
   handleSidenavColor,
   handleSidenavType,
   handleFixedNavbar,
-}) {
+}) => {
   const { Title, Text } = Typography;
 
   const [visible, setVisible] = useState(false);
@@ -267,6 +272,19 @@ function Header({
 
   const showDrawer = () => setVisible(true);
   const hideDrawer = () => setVisible(false);
+
+  const { logout } = React.useContext(AuthContext);
+
+  const onLogOut = () => {
+    signOut(auth)
+      .then(() => {
+        logout();
+        JSON.stringify(localStorage.removeItem("user"));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <>
@@ -421,10 +439,17 @@ function Header({
               </div>
             </div>
           </Drawer>
-          <Link to="/sign-in" className="btn-sign-in">
+          <div className="btn-sign-in">
             {profile}
-            <span>Sign in</span>
-          </Link>
+            <span>Hello Admin</span>
+            <Button
+              type="link"
+              className="btn-logout"
+              onClick={() => onLogOut()}
+            >
+              <LogoutOutlined />
+            </Button>
+          </div>
           <Input
             className="header-search"
             placeholder="Type here..."
@@ -434,6 +459,6 @@ function Header({
       </Row>
     </>
   );
-}
+};
 
 export default Header;
