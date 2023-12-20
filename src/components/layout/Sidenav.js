@@ -12,7 +12,7 @@
 
 // import { useState } from "react";
 import React from "react";
-import { Menu, Button } from "antd";
+import { Menu } from "antd";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 
@@ -131,7 +131,20 @@ function Sidenav({ color }) {
             >
               {billing}
             </span>
-            <span className="label">Thêm đơn hàng</span>
+            <span className="label">Thêm Sản Phẩm</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="3">
+          <NavLink to="/order">
+            <span
+              className="icon"
+              style={{
+                background: page === "billing" ? color : "",
+              }}
+            >
+              {billing}
+            </span>
+            <span className="label">Kiểm tra đơn hàng</span>
           </NavLink>
         </Menu.Item>
       </Menu>

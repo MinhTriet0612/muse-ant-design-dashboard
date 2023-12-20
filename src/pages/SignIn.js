@@ -9,7 +9,7 @@
 =========================================================
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { auth } from "../service/firebase/firebase";
 import { Link } from "react-router-dom";
 import {
@@ -34,7 +34,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../store/AuthProvider";
 
 function onChange(checked) {
-  console.log(`switch to ${checked}`);
+  // console.log(`switch to ${checked}`);
 }
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
@@ -111,7 +111,7 @@ const SignIn = () => {
   const { user, login } = useContext(AuthContext);
 
   const onFinish = (values) => {
-    console.log("Success:", values);
+    // console.log("Success:", values);
     signInWithEmailAndPassword(auth, values.email, values.password)
       .then((userCredential) => {
         // Signed in
@@ -123,13 +123,13 @@ const SignIn = () => {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorMessage);
+        // console.log(errorMessage);
         setIsError(true);
       });
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    // console.log("Failed:", errorInfo);
   };
   return (
     <>

@@ -21,6 +21,8 @@ import ProductProvider from "./store/product-context";
 import { AuthContext } from "./store/AuthProvider";
 import React, { useContext } from "react";
 import Edit from "./pages/Edit";
+import OrderFromCustomerProvider from "./store/order-from-customer-context";
+import Order from "./pages/Order";
 
 function App() {
   const currentUser = useContext(AuthContext).user;
@@ -39,13 +41,16 @@ function App() {
   return (
     <RequireAuth>
       <ProductProvider>
-        <Main>
-          <Route exact path="/dashboard" component={Home} />
-          <Route exact path="/tables" component={Tables} />
-          <Route exact path="/billing" component={Billing} />
-          <Route exact path="/edit/:id" component={Edit} />
-          <Redirect from="*" to="/tables" />
-        </Main>
+        <OrderFromCustomerProvider>
+          <Main>
+            <Route exact path="/dashboard" component={Home} />
+            <Route exact path="/tables" component={Tables} />
+            <Route exact path="/billing" component={Billing} />
+            <Route exact path="/edit/:id" component={Edit} />
+            <Route exact path="/order" component={Order} />
+            <Redirect from="*" to="/dashboard" />
+          </Main>
+        </OrderFromCustomerProvider>
       </ProductProvider>
     </RequireAuth>
   );

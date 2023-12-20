@@ -2,32 +2,31 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import {
   Button,
-  Cascader,
+  // Cascader,
   Checkbox,
   // ColorPicker,
-  DatePicker,
+  // DatePicker,
   Form,
   Input,
-  InputNumber,
-  Radio,
+  // InputNumber,
+  // Radio,
   Select,
-  Slider,
-  Switch,
-  TreeSelect,
+  // Slider,
+  // Switch,
+  // TreeSelect,
   Upload,
   notification,
   message,
 } from "antd";
-import { db, storage } from "../service/firebase/firebase";
+import { storage } from "../service/firebase/firebase";
 import {
   getDownloadURL,
-  listAll,
+  // listAll,
   ref,
   uploadBytesResumable,
-  deleteObject,
+  // deleteObject,
 } from "firebase/storage";
 import { ProductContext } from "../store/product-context";
-import { getDocs, collection } from "firebase/firestore";
 const { TextArea } = Input;
 const normFile = (e) => {
   if (Array.isArray(e)) {
@@ -41,6 +40,7 @@ const getBase64 = (img, callback) => {
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
+
 const beforeUpload = (file) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
@@ -54,13 +54,13 @@ const beforeUpload = (file) => {
 };
 
 const FormDisabledDemo = () => {
-  const [per, setPerc] = useState(null);
+  // const [per, setPerc] = useState(null);
   const nameProductRef = useRef();
   const brandRef = useRef();
   const discountRef = useRef();
   const priceRef = useRef();
   const descriptionRef = useRef("");
-  const imageRef = useRef();
+  // const imageRef = useRef();
   const typeProductRef = useRef();
   const [componentDisabled, setComponentDisabled] = useState(false);
   const [imgUrl, setImgUrl] = useState({});
@@ -85,6 +85,7 @@ const FormDisabledDemo = () => {
       });
     }
   };
+
   const uploadButton = (
     <div>
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
@@ -125,25 +126,26 @@ const FormDisabledDemo = () => {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          setPerc(progress);
+          // console.log("Upload is " + progress + "% done");
+          // setPerc(progress);
           switch (snapshot.state) {
             case "paused":
-              console.log("Upload is paused");
+              // console.log("Upload is paused");
               break;
             case "running":
-              console.log("Upload is running");
+              // console.log("Upload is running");
               break;
             default:
               break;
           }
         },
         (error) => {
-          console.log(error);
+          alert(error);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImgUrl({ img: downloadURL });
+            openNotification("Thông báo", "Thêm ảnh thành công");
           });
         }
       );
@@ -178,19 +180,11 @@ const FormDisabledDemo = () => {
         id: uuidv4(),
         key: typeProductRef.current,
         title: nameProductRef.current.input.value,
-        brand: brandRef.current.input.value,
-        discountPercentage: discountRef.current.input.value,
-        price: priceRef.current.input.value,
-        description: descriptionRef.current.resizableTextArea.textArea.value,
-        thumbnail: imgUrl.img,
-      });
-      console.log({
-        id: uuidv4(),
-        key: typeProductRef.current,
-        title: nameProductRef.current.input.value,
-        brand: brandRef.current.input.value,
-        discountPercentage: discountRef.current.input.value,
-        price: priceRef.current.input.value,
+        brand:
+          brandRef.current.input.value.charAt(0).toUpperCase() +
+          brandRef.current.input.value.slice(1),
+        discountPercentage: Number(discountRef.current.input.value),
+        price: Number(priceRef.current.input.value),
         description: descriptionRef.current.resizableTextArea.textArea.value,
         thumbnail: imgUrl.img,
       });
@@ -199,7 +193,7 @@ const FormDisabledDemo = () => {
         "Thêm sản phẩm thất bại",
         "Vui lòng nhập đầy đủ thông tin sản phẩm"
       );
-      console.log(products);
+      // console.log(products);
     }
   };
 
@@ -214,10 +208,10 @@ const FormDisabledDemo = () => {
     }
   };
 
-  const actionUpload = (file) => {
-    imageRef.current = file;
-    console.log(imageRef.current);
-  };
+  // const actionUpload = (file) => {
+  //   imageRef.current = file;
+  //   console.log(imageRef.current);
+  // };
 
   return (
     <>
@@ -328,13 +322,12 @@ const FormDisabledDemo = () => {
             listType="picture-card"
             className="avatar-uploader"
             showUploadList={false}
-            action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
             beforeUpload={beforeUpload}
             onChange={handleChange}
           >
-            {imageUrl ? (
+            {imgUrl?.img ? (
               <img
-                src={imageUrl}
+                src={imgUrl.img}
                 alt="avatar"
                 style={{
                   width: "100%",
@@ -361,7 +354,9 @@ const FormDisabledDemo = () => {
         <Button
           type="primary"
           htmlType="submit"
-          onClick={handleOnClickForAddProduct}
+          onClick={() => {
+            handleOnClickForAddProduct();
+          }}
         >
           Thêm Sản Phẩm
         </Button>

@@ -1,11 +1,5 @@
 import React, { useReducer, useEffect } from "react";
-import {
-  deleteDoc,
-  setDoc,
-  doc,
-  getDocs,
-  collection,
-} from "firebase/firestore";
+import { setDoc, doc, getDocs, collection } from "firebase/firestore";
 import { db } from "../service/firebase/firebase";
 
 const ProductContext = React.createContext({
@@ -46,20 +40,20 @@ const reducer = (state, action) => {
             },
           ],
         });
-        // const docRef = doc(db, "products", product.key);
-        // setDoc(docRef, {
-        //   products: [
-        //     {
-        //       id: product.id,
-        //       brand: product.brand,
-        //       discountPercentage: product.discountPercentage,
-        //       title: product.title,
-        //       thumbnail: product.thumbnail,
-        //       price: product.price,
-        //       description: product.description,
-        //     },
-        //   ],
-        // });
+        const docRef = doc(db, "products", product.key);
+        setDoc(docRef, {
+          products: [
+            {
+              id: product.id,
+              brand: product.brand,
+              discountPercentage: product.discountPercentage,
+              title: product.title,
+              thumbnail: product.thumbnail,
+              price: product.price,
+              description: product.description,
+            },
+          ],
+        });
         return { ...state, products: [...newProducts] };
       }
       newProducts[indexObj].products.push({
@@ -71,17 +65,20 @@ const reducer = (state, action) => {
         price: product.price,
         description: product.description,
       });
-      // const docRef = doc(db, "products", product.key);
-      // setDoc(docRef, {
-      //   products: newProducts[indexObj].products,
-      // });
+      const docRef = doc(db, "products", product.key);
+      setDoc(docRef, {
+        products: newProducts[indexObj].products,
+      });
       return { ...state, products: [...newProducts] };
     }
 
     case actions.REMOVE_PRODUCT: {
-      console.log(action.payload);
+      // console.log(action.payload);
       const productId = action.payload;
       const newProducts = [...state.products];
+      const indexObj = newProducts.findIndex((item) => {
+        return item.products.some((product) => product.id === productId);
+      });
       const newProductsAfterRemove = newProducts.map((item) => {
         return {
           key: item.key,
@@ -89,7 +86,12 @@ const reducer = (state, action) => {
         };
       });
 
-      console.log(newProductsAfterRemove);
+      // console.log(newProductsAfterRemove);
+      const docRef = doc(db, "products", newProducts[indexObj].key);
+      setDoc(docRef, {
+        products: newProductsAfterRemove[indexObj].products,
+      });
+
       return { ...state, products: [...newProductsAfterRemove] };
     }
     case actions.UPDATE_PRODUCT: {
@@ -97,6 +99,9 @@ const reducer = (state, action) => {
     }
     case actions.GET_DATA_FROM_DATABASE: {
       return { ...state, products: action.payload };
+    }
+    default: {
+      return state;
     }
   }
 };
@@ -108,9 +113,10 @@ const ProductProvider = ({ children }) => {
       const data = querySnapshot.docs.map((doc) => {
         return {
           key: doc.id,
-          products: doc.data().products,
+          products: doc.data().products || [],
         };
       });
+      // console.log(data);
       getDataFromDatabase(data);
     };
     getData();
