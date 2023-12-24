@@ -11,7 +11,9 @@ import {
   // Dropdown,
   // Space,
   List,
+  Button,
 } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import React, { useContext } from "react";
 import { OrderFromCustomerContext } from "../store/order-from-customer-context";
 
@@ -43,10 +45,19 @@ const columns = [
     key: "total",
     dataIndex: "total",
   },
+  {
+    title: "THAO TÁC",
+    key: "action",
+    dataIndex: "action",
+    fixed: "right",
+    width: 100,
+  },
 ];
 
 const Order = () => {
-  const { orderFromCustomer } = useContext(OrderFromCustomerContext);
+  const { orderFromCustomer, removeOrderFromCustomer } = useContext(
+    OrderFromCustomerContext
+  );
 
   const data = orderFromCustomer.map((order) => {
     return {
@@ -93,6 +104,11 @@ const Order = () => {
         <>
           <Title level={5}>{numberToVND(order.total)}</Title>
         </>
+      ),
+      action: (
+        <Button onClick={() => removeOrderFromCustomer(order.id)}>
+          Xóa <DeleteOutlined />
+        </Button>
       ),
     };
   });

@@ -1,6 +1,7 @@
 import React, { useEffect, useReducer } from "react";
 import { db } from "../service/firebase/firebase";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, doc, deleteDoc } from "firebase/firestore";
+import { notification } from "antd";
 
 export const OrderFromCustomerContext = React.createContext({
   orderFromCustomer: [],
@@ -17,6 +18,13 @@ const actions = {
   GET_DATA_FROM_DATABASE: "GET_DATA_FROM_DATABASE",
 };
 
+const openNotification = (title, message) => {
+  notification.open({
+    message: title,
+    description: message,
+  });
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case actions.GET_DATA_FROM_DATABASE: {
@@ -24,12 +32,22 @@ const reducer = (state, action) => {
       return { ...state, orderFromCustomer: [...action.payload] };
     }
     case actions.REMOVE_ORDER_FROM_CUSTOMER: {
-      const id = action.payload;
-      const newOrderFromCustomer = [...state.orderFromCustomer].filter(
-        (order) => order.id !== id
-      );
+      deleteDoc(doc(db, "orders", action.payload))
+        .then(() => {
+          openNotification("Xóa thành công", "");
+        })
+        .catch((error) => {
+          openNotification("Xóa thất bại", "Mời bạn reload lại page để xóa");
+        });
 
-      return { ...state, orderFromCustomer: [...newOrderFromCustomer] };
+      return {
+        ...state,
+        orderFromCustomer: [
+          ...state.orderFromCustomer.filter(
+            (order) => order.id !== action.payload
+          ),
+        ],
+      };
     }
     default:
       return state;

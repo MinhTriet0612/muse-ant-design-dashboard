@@ -1,6 +1,7 @@
 import React, { useReducer, useEffect } from "react";
 import { setDoc, doc, getDocs, collection } from "firebase/firestore";
 import { db } from "../service/firebase/firebase";
+import { notification } from "antd";
 
 const ProductContext = React.createContext({
   products: [],
@@ -14,6 +15,13 @@ const actions = {
   REMOVE_PRODUCT: "REMOVE_PRODUCT",
   UPDATE_PRODUCT: "UPDATE_PRODUCT",
   GET_DATA_FROM_DATABASE: "GET_DATA_FROM_DATABASE",
+};
+
+const openNotification = (title, message) => {
+  notification.open({
+    message: title,
+    description: message,
+  });
 };
 
 const reducer = (state, action) => {
@@ -53,7 +61,17 @@ const reducer = (state, action) => {
               description: product.description,
             },
           ],
-        });
+        })
+          .then(() => {
+            openNotification("Thêm thành công", "");
+          })
+          .catch((error) => {
+            openNotification(
+              "Thêm thất bại",
+              "Mời bạn reload lại page để thêm"
+            );
+          });
+
         return { ...state, products: [...newProducts] };
       }
       newProducts[indexObj].products.push({
@@ -68,7 +86,10 @@ const reducer = (state, action) => {
       const docRef = doc(db, "products", product.key);
       setDoc(docRef, {
         products: newProducts[indexObj].products,
+      }).then(() => {
+        openNotification("Thêm thành công", "");
       });
+
       return { ...state, products: [...newProducts] };
     }
 
@@ -90,6 +111,8 @@ const reducer = (state, action) => {
       const docRef = doc(db, "products", newProducts[indexObj].key);
       setDoc(docRef, {
         products: newProductsAfterRemove[indexObj].products,
+      }).then(() => {
+        openNotification("Xóa thành công", "");
       });
 
       return { ...state, products: [...newProductsAfterRemove] };
