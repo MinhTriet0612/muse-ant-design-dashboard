@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  LoadingOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   // Cascader,
@@ -17,16 +21,20 @@ import {
   Upload,
   notification,
   message,
+  Image,
+  List,
+  Flex,
 } from "antd";
-import { storage } from "../service/firebase/firebase";
+
 import {
   getDownloadURL,
   // listAll,
   ref,
   uploadBytesResumable,
-  // deleteObject,
+  deleteObject,
 } from "firebase/storage";
 import { ProductContext } from "../store/product-context";
+import { storage } from "../service/firebase/firebase";
 const { TextArea } = Input;
 const normFile = (e) => {
   if (Array.isArray(e)) {
@@ -67,9 +75,11 @@ const FormDisabledDemo = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentProducts, setCurrentProducts] = useState([]);
-  const [imageUrl, setImageUrl] = useState();
   const { addProduct, products } = useContext(ProductContext);
   const { v4: uuidv4 } = require("uuid");
+
+  const [fileList, setFileList] = useState([]);
+  const [listUrl, setListUrl] = useState([]);
 
   const handleChange = (info) => {
     if (info.file.status === "uploading") {
@@ -81,17 +91,25 @@ const FormDisabledDemo = () => {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj, (url) => {
         setLoading(false);
-        setImageUrl(url);
       });
     }
   };
 
   const uploadButton = (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+    <div
+      style={{
+        border: "1px solid black",
+        padding: "10px",
+        borderRadius: "5px",
+        margin: "0 center",
+      }}
+    >
+      <div style={{ textAlign: "center" }}>
+        {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      </div>
       <div
         style={{
-          marginTop: 8,
+          marginTop: "8",
         }}
       >
         Upload
@@ -116,8 +134,6 @@ const FormDisabledDemo = () => {
     console.log(file);
     const uploadFile = () => {
       const name = new Date().getTime() + file.name;
-
-      console.log(name);
       const storageRef = ref(storage, file.name);
       const uploadTask = uploadBytesResumable(storageRef, file.originFileObj);
 
@@ -145,11 +161,32 @@ const FormDisabledDemo = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImgUrl({ img: downloadURL });
+            console.log(downloadURL);
             openNotification("Thông báo", "Thêm ảnh thành công");
+            setFileList([
+              ...fileList,
+              {
+                uid: file.uid,
+                url: downloadURL,
+                name: file.name,
+                status: "done",
+                thumbUrl: downloadURL,
+              },
+            ]);
+            setListUrl([...listUrl, downloadURL]);
+            setLoading(false);
+            console.log(fileList);
           });
+
+          // uid: info.file.uid,
+          // name: info.file.name,
+          // status: "done",
+          // url: url,
+          // thumbUrl: url,
         }
       );
     };
+
     file && uploadFile();
   }, [file]);
 
@@ -168,11 +205,9 @@ const FormDisabledDemo = () => {
       discountRef.current.input.value &&
       priceRef.current.input.value &&
       descriptionRef.current.resizableTextArea.textArea.value &&
-      imgUrl.img &&
+      listUrl.length &&
       !currentProducts.find(
-        (products) =>
-          products.title === nameProductRef.current.input.value &&
-          products.thumbnail === imgUrl.img
+        (products) => products.title === nameProductRef.current.input.value
       )
     ) {
       openNotification("Thêm sản phẩm thành công", "Thêm sản phẩm thành công");
@@ -186,27 +221,62 @@ const FormDisabledDemo = () => {
         discountPercentage: Number(discountRef.current.input.value),
         price: Number(priceRef.current.input.value),
         description: descriptionRef.current.resizableTextArea.textArea.value,
-        thumbnail: imgUrl.img,
+        thumbnail: [...listUrl],
+      });
+
+      console.log({
+        id: uuidv4(),
+        key: typeProductRef.current,
+        title: nameProductRef.current.input.value,
+        brand:
+          brandRef.current.input.value.charAt(0).toUpperCase() +
+          brandRef.current.input.value.slice(1),
+        discountPercentage: Number(discountRef.current.input.value),
+        price: Number(priceRef.current.input.value),
+        description: descriptionRef.current.resizableTextArea.textArea.value,
+        thumbnail: [...listUrl],
       });
     } else {
       openNotification(
         "Thêm sản phẩm thất bại",
         "Vui lòng nhập đầy đủ thông tin sản phẩm"
       );
-      // console.log(products);
     }
   };
 
-  const onPreview = async (file) => {
-    let src = file.url;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj);
-        reader.onload = () => resolve(reader.result);
+  const onRemoveFile = (file) => {
+    const storageRef = ref(storage, file.name);
+    deleteObject(storageRef)
+      .then(() => {
+        notification.open({
+          message: "Thông báo",
+          description: "Xóa ảnh thành công",
+        });
+        console.log(file);
+        const newFileList = fileList.filter((item) => item.uid !== file.uid);
+        setFileList(newFileList);
+        const newListUrl = listUrl.filter((item) => item !== file.url);
+        setListUrl(newListUrl);
+      })
+      .catch((error) => {
+        console.log(error);
+        notification.open({
+          message: "Thông báo",
+          description: "Xóa ảnh thất bại",
+        });
       });
-    }
   };
+
+  // const onPreview = async (file) => {
+  //   let src = file.url;
+  //   if (!src) {
+  //     src = await new Promise((resolve) => {
+  //       const reader = new FileReader();
+  //       reader.readAsDataURL(file.originFileObj);
+  //       reader.onload = () => resolve(reader.result);
+  //     });
+  //   }
+  // };
 
   // const actionUpload = (file) => {
   //   imageRef.current = file;
@@ -319,24 +389,39 @@ const FormDisabledDemo = () => {
         >
           <Upload
             name="avatar"
-            listType="picture-card"
+            listType="picture"
             className="avatar-uploader"
-            showUploadList={false}
             beforeUpload={beforeUpload}
             onChange={handleChange}
+            fileList={[...fileList]}
+            onRemove={(file) => {
+              onRemoveFile(file);
+            }}
           >
-            {imgUrl?.img ? (
-              <img
-                src={imgUrl.img}
-                alt="avatar"
-                style={{
-                  width: "100%",
-                }}
-              />
-            ) : (
-              uploadButton
-            )}
+            {/* <Button icon={<UploadOutlined />}>Upload</Button> */}
+            {uploadButton}
           </Upload>
+          {/* {fileList.length >= 1
+            ? fileList.map((item) => (
+                <Flex style={{ alignContent: "center" }}>
+                  <div
+                    style={{
+                      width: "30%",
+                      border: "2px solid black",
+                      margin: "10px 0",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <Image
+                      src={item.url}
+                      alt="avatar"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                  <Button>Xóa</Button>
+                </Flex> */}
+          {/* )) */}
+          {/* : ""} */}
         </Form.Item>
 
         <Form.Item

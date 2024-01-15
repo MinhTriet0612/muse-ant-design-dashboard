@@ -23,6 +23,7 @@ import React, { useContext } from "react";
 import Edit from "./pages/Edit";
 import OrderFromCustomerProvider from "./store/order-from-customer-context";
 import Order from "./pages/Order";
+import { BrowserRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 function App() {
   const currentUser = useContext(AuthContext).user;
@@ -43,12 +44,14 @@ function App() {
       <ProductProvider>
         <OrderFromCustomerProvider>
           <Main>
+            <BrowserRouter />
             <Route exact path="/dashboard" component={Home} />
             <Route exact path="/tables" component={Tables} />
             <Route exact path="/billing" component={Billing} />
             <Route exact path="/edit/:id" component={Edit} />
             <Route exact path="/order" component={Order} />
             <Redirect from="*" to="/dashboard" />
+            <BrowserRouter />
           </Main>
         </OrderFromCustomerProvider>
       </ProductProvider>

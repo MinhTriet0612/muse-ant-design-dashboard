@@ -14,6 +14,8 @@ import {
   Image,
   Dropdown,
   Space,
+  List,
+  Flex,
 } from "antd";
 import { ProductContext } from "../store/product-context";
 import React, { useCallback, useContext, useEffect } from "react";
@@ -207,7 +209,17 @@ const Tables = () => {
       ),
       thumbnail: (
         <div style={{ width: "100%" }}>
-          <Image src={product.thumbnail} style={{ borderRadius: "10px" }} />
+          <Flex style={{ flexDirection: "column" }} gap="0.5rem">
+            {product.thumbnail.map((item, index) => {
+              return (
+                <Image
+                  key={index}
+                  src={item}
+                  style={{ borderRadius: "10px", width: "100%" }}
+                />
+              );
+            })}
+          </Flex>
         </div>
       ),
       discountPercentage: <span>{product.discountPercentage}</span>,
