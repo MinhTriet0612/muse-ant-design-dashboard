@@ -117,12 +117,47 @@ const reducer = (state, action) => {
 
       return { ...state, products: [...newProductsAfterRemove] };
     }
+
     case actions.UPDATE_PRODUCT: {
-      return;
+      console.log(action.payload);
+      const product = { ...action.payload };
+      const newProducts = [...state.products];
+      const indexObj = newProducts.findIndex(
+        (item) => item.key === product.key
+      );
+      const indexProduct = newProducts[indexObj].products.findIndex(
+        (item) => item.id === product.id
+      );
+      newProducts[indexObj].products[indexProduct] = {
+        id: product.id,
+        brand: product.brand,
+        discountPercentage: product.discountPercentage,
+        title: product.title,
+        thumbnail: product.thumbnail,
+        price: product.price,
+        description: product.description,
+      };
+      console.log(newProducts[indexObj]);
+      const docRef = doc(db, "products", product.key);
+      setDoc(docRef, {
+        products: newProducts[indexObj].products,
+      })
+        .then(() => {
+          openNotification("Cập nhật thành công", "");
+        })
+        .catch((error) => {
+          openNotification(
+            "Cập nhật thất bại",
+            "Mời bạn reload lại page để cập nhật"
+          );
+        });
+      return { ...state, products: [...newProducts] };
     }
+
     case actions.GET_DATA_FROM_DATABASE: {
       return { ...state, products: action.payload };
     }
+
     default: {
       return state;
     }
@@ -159,10 +194,10 @@ const ProductProvider = ({ children }) => {
     });
   };
 
-  const updateProduct = (productId, productBrand) => {
+  const updateProduct = (product) => {
     dispatch({
       type: actions.UPDATE_PRODUCT,
-      payload: { productId, productBrand },
+      payload: { ...product },
     });
   };
 

@@ -210,7 +210,6 @@ const FormDisabledDemo = () => {
         (products) => products.title === nameProductRef.current.input.value
       )
     ) {
-      openNotification("Thêm sản phẩm thành công", "Thêm sản phẩm thành công");
       addProduct({
         id: uuidv4(),
         key: typeProductRef.current,

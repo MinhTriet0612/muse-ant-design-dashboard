@@ -9,7 +9,7 @@
 =========================================================
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Tables from "./pages/Tables";
 import Billing from "./pages/Billing";
@@ -50,6 +50,7 @@ function App() {
             <Route exact path="/billing" component={Billing} />
             <Route exact path="/edit/:id" component={Edit} />
             <Route exact path="/order" component={Order} />
+            {/* <Redirect from="*" to="/dashboard" /> */}
             <Redirect from="*" to="/dashboard" />
             <BrowserRouter />
           </Main>

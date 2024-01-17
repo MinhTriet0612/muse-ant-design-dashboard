@@ -192,6 +192,10 @@ const Tables = () => {
     }
   }, [selectedType.key, products]);
 
+  useEffect(() => {
+    console.log(products);
+  }, [products]);
+
   const data = currentData.map((product) => {
     return {
       key: product.id,
@@ -228,8 +232,22 @@ const Tables = () => {
       edit: (
         <>
           <Button>
-            <Link to={`/edit/${product.id}`}>Chỉnh sửa</Link>
-          </Button>{" "}
+            <Link
+              to={{
+                pathname: `/edit/${product.id}`,
+                state: {
+                  ...product,
+                  key: products.find((item) => {
+                    return item.products.some(
+                      (productItem) => productItem.id === product.id
+                    );
+                  }).key,
+                },
+              }}
+            >
+              Chỉnh sửa
+            </Link>
+          </Button>
           <Button
             onClick={() => {
               removeProduct(product.id);
